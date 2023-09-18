@@ -4,6 +4,7 @@ const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
 const app = express();
+const { v4 } = require('uuid');
 
 const port = process.env.PORT || 3000;
 dotenv.config();
@@ -112,6 +113,15 @@ const S3 = new S3Client({
     res.send('CLI backend Server is Ready.....');
   });
   
+
+
+  app.get('/api', (req, res) => {
+    const path = `/api/item/${v4()}`;
+    res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
+    res.end(`Hello! Go to item: <a href="${path}">${path}</a>`);
+  });
+
   // * Basic Server Port Check on Console
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
