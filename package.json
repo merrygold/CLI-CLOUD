@@ -1,0 +1,19 @@
+{
+  "name": "cloud-cli",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000C\u0000L\u0000I\u0000-\u0000C\u0000L\u0000O\u0000U\u0000D\u0000\r\u0000 \u0000",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.414.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1"
+  }
+}

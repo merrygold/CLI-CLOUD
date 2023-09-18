@@ -1,0 +1,103 @@
+const {S3Client , PutObjectCommand ,GetObjectCommand ,DeleteObjectCommand } = require('@aws-sdk/client-s3')
+const dotenv = require('dotenv')
+const express = require('express');
+const multer = require('multer');
+const cors = require('cors');
+const app = express();
+
+dotenv.config();
+app.use(cors());
+
+// * Set up Multer with the storage
+const storage = multer.memoryStorage();
+const upload = multer({storage});
+// *! CloudFlare Credentials
+
+const S3 = new S3Client({
+    region: 'auto',
+    endpoint: process.env.ENDPOINT,
+    credentials: {
+      accessKeyId: process.env.R2_ACCESS_KEY_ID,
+      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+    },
+  });
+  
+  
+  //* For Uploading the File on Cloudflare Storage
+  
+  app.post('/upload', upload.single('file'), async (req, res) => {
+    try {
+      await S3.send(
+        new PutObjectCommand({
+          Body: req.file.buffer,
+          Bucket: 'cli-storage',
+          Key: req.file.originalname,
+          ContentType: req.file.mimetype,
+        })
+      );
+     res.send('File Upload');
+      //  return res.status(200).json({ message: `File "${req.file.originalname}" uploaded successfully.` });
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      res.status(500).send('Internal server error');
+    }
+  });
+  
+  
+  
+  //* For Accessing the file with {filename} param from the Cloudflare Storage
+  
+  app.get('/draw-chart/:filename', async (req, res) => {
+    const { filename } = req.params; // Get the filename from the route parameters
+  
+    console.log(filename)
+    try {
+      const data = await S3.send(
+        new GetObjectCommand({
+          Bucket: 'cli-storage', // Replace with your S3 bucket name
+          Key: filename, // Use the filename from the route params as the key
+        })
+      );
+  
+      console.log(typeof(data))
+    
+      
+      // Set the appropriate response headers based on the file's metadata
+      res.set('Content-Type', 'text/csv');
+      res.set('Content-Disposition', `attachment; filename="${filename}"`);
+  
+      // Send the file data as the response
+    
+      data.Body.pipe(res);
+    } catch (error) {
+      console.error('Error retrieving file from S3:', error);
+  
+     
+      res.status(500).json({ message: 'Internal server error.' });
+    }
+  });
+  
+  
+  
+  //* For Delete file with {filename} param on the Cloudflare Storage
+  
+  app.delete('/delete-file/:filename', async (req, res) => {
+    const { filename } = req.params; // Get the filename from the route parameters
+  
+    try {
+      const deleteParams = {
+        Bucket: 'cli-storage', // Replace with your S3 bucket name
+        Key: filename, // Use the filename from the route params as the key
+      };
+  
+      await S3.send(new DeleteObjectCommand(deleteParams));
+      
+      await res.status(200).json({ message: `File "${filename}" deleted successfully.` });
+  
+    
+    } catch (error) {
+      console.error('Error deleting file from S3:', error);
+      res.status(500).json({ message: 'Internal server error.' });
+    }
+  });
+  
