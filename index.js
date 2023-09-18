@@ -27,7 +27,7 @@ const S3 = new S3Client({
   
   //* For Uploading the File on Cloudflare Storage
   
-  app.post('/api/upload', upload.single('file'), async (req, res) => {
+  app.post('/upload', upload.single('file'), async (req, res) => {
     try {
       await S3.send(
         new PutObjectCommand({
@@ -49,7 +49,7 @@ const S3 = new S3Client({
   
   //* For Accessing the file with {filename} param from the Cloudflare Storage
   
-  app.get('/api/draw-chart/:filename', async (req, res) => {
+  app.get('/draw-chart/:filename', async (req, res) => {
     const { filename } = req.params; // Get the filename from the route parameters
   
     console.log(filename)
@@ -83,7 +83,7 @@ const S3 = new S3Client({
   
   //* For Delete file with {filename} param on the Cloudflare Storage
   
-  app.delete('/api/delete-file/:filename', async (req, res) => {
+  app.delete('/delete-file/:filename', async (req, res) => {
     const { filename } = req.params; // Get the filename from the route parameters
   
     try {
@@ -105,7 +105,7 @@ const S3 = new S3Client({
   
 
   // * Basic Server Check
-  app.get('/api', (req, res) => {
+  app.get('/', (req, res) => {
     res.send('CLI backend Server is Ready.....');
   });
 
