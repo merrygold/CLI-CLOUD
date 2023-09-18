@@ -104,10 +104,13 @@ const S3 = new S3Client({
   
 
   // * Basic Server Check
-app.get('/', (req, res) => {
+  app.get('/', (req, res) => {
     res.send('CLI backend Server is Ready.....');
   });
   
+  app.get('/get', (req, res) => {
+    res.send('CLI backend Server is Ready.....');
+  });
   
   // * Basic Server Port Check on Console
   app.listen(port, () => {
