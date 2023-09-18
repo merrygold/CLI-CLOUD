@@ -4,6 +4,7 @@ const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
 const app = express();
+const port = 3000;
 
 dotenv.config();
 app.use(cors());
@@ -100,4 +101,17 @@ const S3 = new S3Client({
       res.status(500).json({ message: 'Internal server error.' });
     }
   });
+  
+
+  // * Basic Server Check
+app.get('/', (req, res) => {
+    res.send('CLI backend Server is Ready.....');
+  });
+  
+  
+  // * Basic Server Port Check on Console
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
+  
   
