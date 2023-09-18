@@ -4,7 +4,7 @@ const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
 const app = express();
-const { v4 } = require('uuid');
+
 
 const port = process.env.PORT || 3000;
 dotenv.config();
@@ -27,7 +27,7 @@ const S3 = new S3Client({
   
   //* For Uploading the File on Cloudflare Storage
   
-  app.post('/upload', upload.single('file'), async (req, res) => {
+  app.post('/api/upload', upload.single('file'), async (req, res) => {
     try {
       await S3.send(
         new PutObjectCommand({
@@ -49,7 +49,7 @@ const S3 = new S3Client({
   
   //* For Accessing the file with {filename} param from the Cloudflare Storage
   
-  app.get('/draw-chart/:filename', async (req, res) => {
+  app.get('/api/draw-chart/:filename', async (req, res) => {
     const { filename } = req.params; // Get the filename from the route parameters
   
     console.log(filename)
@@ -83,7 +83,7 @@ const S3 = new S3Client({
   
   //* For Delete file with {filename} param on the Cloudflare Storage
   
-  app.delete('/delete-file/:filename', async (req, res) => {
+  app.delete('/api/delete-file/:filename', async (req, res) => {
     const { filename } = req.params; // Get the filename from the route parameters
   
     try {
@@ -105,23 +105,11 @@ const S3 = new S3Client({
   
 
   // * Basic Server Check
-  app.get('/', (req, res) => {
-    res.send('CLI backend Server is Ready.....');
-  });
-  
-  app.get('/get', (req, res) => {
-    res.send('CLI backend Server is Ready.....');
-  });
-  
-
-
   app.get('/api', (req, res) => {
-    const path = `/api/item/${v4()}`;
-    res.setHeader('Content-Type', 'text/html');
-    res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
-    res.end(`Hello! Go to item: <a href="${path}">${path}</a>`);
+    res.send('CLI backend Server is Ready.....');
   });
 
+  
   // * Basic Server Port Check on Console
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
