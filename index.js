@@ -34,21 +34,24 @@ const S3 = new S3Client({
       cb(new Error('Invalid file type. Only CSV files are allowed.'), false); // Reject the file
     }
   };
-
+  
   const upload = multer({ storage, fileFilter });
   
   app.post('/upload', upload.single('file'), async (req, res) => {
     try {
-      await S3.send(
-        new PutObjectCommand({
-          Body: req.file.buffer,
-          Bucket: 'cli-storage',
-          Key: req.file.originalname,
-          ContentType: req.file.mimetype,
-        })
-      );
-     res.send('File Upload');
-      //  return res.status(200).json({ message: `File "${req.file.originalname}" uploaded successfully.` });
+      if (req.file) {
+        await S3.send(
+          new PutObjectCommand({
+            Body: req.file.buffer,
+            Bucket: 'cli-storage',
+            Key: req.file.originalname,
+            ContentType: req.file.mimetype,
+          })
+        );
+        res.status(200).send('File Upload: File should be CSV.');
+      } else {
+        res.status(400).send('No file uploaded.');
+      }
     } catch (error) {
       console.error('Error uploading file:', error);
       res.status(500).send('Internal server error');
