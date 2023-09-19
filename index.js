@@ -64,8 +64,7 @@ const S3 = new S3Client({
   
   app.get('/draw-chart/:filename', async (req, res) => {
     const { filename } = req.params; // Get the filename from the route parameters
-  
-    console.log(filename)
+
     try {
       const data = await S3.send(
         new GetObjectCommand({
@@ -74,16 +73,13 @@ const S3 = new S3Client({
         })
       );
   
-      console.log(typeof(data))
-    
-      
       // Set the appropriate response headers based on the file's metadata
       res.set('Content-Type', 'text/csv');
       res.set('Content-Disposition', `attachment; filename="${filename}"`);
   
       // Send the file data as the response
-    
       data.Body.pipe(res);
+
     } catch (error) {
       console.error('Error retrieving file from S3:', error);
   
@@ -107,7 +103,7 @@ const S3 = new S3Client({
   
       await S3.send(new DeleteObjectCommand(deleteParams));
       
-      await res.status(200).json({ message: `File "${filename}" deleted successfully.` });
+      res.status(200).json({ message: `File "${filename}" deleted successfully.` });
   
     
     } catch (error) {
