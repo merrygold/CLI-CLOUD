@@ -31,7 +31,9 @@ const S3 = new S3Client({
     if (file.mimetype === 'text/csv') {
       cb(null, true); // Accept the file
     } else {
-      cb(new Error('Invalid file type. Only CSV files are allowed.'), false); // Reject the file
+      const error = new Error('Invalid file type. Only CSV files are allowed.');
+      error.status = 400; // Set a custom status code
+      cb(error, false); // Reject the file with a custom error
     }
   };
   
@@ -53,8 +55,12 @@ const S3 = new S3Client({
         res.status(400).send('No file uploaded.');
       }
     } catch (error) {
-      console.error('Error uploading file:', error);
-      res.status(500).send('Internal server error');
+      if (error.status === 400 && error.message === 'Invalid file type. Only CSV files are allowed.') {
+        res.status(400).send(error.message); // Custom error message for file type validation
+      } else {
+        console.error('Error uploading file:', error);
+        res.status(500).send('Internal server error');
+      }
     }
   });
   
