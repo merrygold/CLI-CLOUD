@@ -12,7 +12,7 @@ app.use(cors());
 
 // * Set up Multer with the storage
 const storage = multer.memoryStorage();
-const upload = multer({storage});
+
 // *! CloudFlare Credentials
 
 const S3 = new S3Client({
@@ -26,6 +26,16 @@ const S3 = new S3Client({
   
   
   //* For Uploading the File on Cloudflare Storage
+
+  const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'text/csv') {
+      cb(null, true); // Accept the file
+    } else {
+      cb(new Error('Invalid file type. Only CSV files are allowed.'), false); // Reject the file
+    }
+  };
+
+  const upload = multer({ storage, fileFilter });
   
   app.post('/upload', upload.single('file'), async (req, res) => {
     try {
